@@ -1,0 +1,29 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.component_name }}
+  description: ${{ values.description }}
+  annotations:
+    github.com/project-slug: ${{ values.github_org }}/${{ values.component_name }}
+spec:
+  type: api
+  lifecycle: ${{ values.lifecycle }}
+  owner: group:${{ values.owner_name }}
+  system: system:${{ values.system_name }}
+  providesApis:
+    - resource:${{ values.component_name }}
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: ${{ values.component_name }}
+  description: ${{ valiues.api_description }}
+spec:
+  type: openapi
+  system: system:${{ values.system_name }}
+  lifecycle: ${{ values.lifecycle }}
+  owner: group:${{ values.owner_name }}
+  definition:
+    $text: https://github.com/${{ values.github_org }}/${{ values.component_name }}/blob/main/openapi.yaml

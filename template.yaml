@@ -1,0 +1,216 @@
+---
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: aws-sam-nodejs-crud
+  title: AWS Serverless CRUD API (NodeJS/Typescript)
+  description: |
+    Create a NodeJS / Typescript AWS serverless CRUD backend API.
+
+    This template provides the following for the newly created Component
+
+    * AWS API Gateway
+    * Lambda functions for CRUD operations
+      * With starter code
+      * With starter tests
+      * With starter mock data and schemas
+    * A DynamoDB table
+    * GitHub Actions build and deploy workflows
+    * Starter OpenAPI spec file
+
+  tags:
+    - aws
+    - serverless
+    - nodejs
+    - typescript
+    - api
+
+spec:
+  owner: developers
+  type: component
+
+  parameters:
+    - title: Component Info
+      required:
+        - lifecycle
+        - namespace
+        - github_org
+        - component_name
+        - description
+        - owner
+        - system
+        - domain
+        - account_id
+      properties:
+        lifecycle:
+          title: Lifecycle
+          type: string
+          description: Lifecycle for the component
+          default: production
+          ui:widget: hidden
+        namespace:
+          title: Namespace
+          type: string
+          description: Namespace for the component
+          default: default
+          ui:widget: hidden
+        github_org:
+          title: GitHub Org
+          type: string
+          description: GitHub organization to publish to
+          default: ServerlessOpsIO
+          ui:widget: hidden
+        component_name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Short description of the component
+        owner:
+          title: Owner
+          type: string
+          description: |
+            Owning group of entity.
+          ui:field: MyGroupsPicker
+          ui:options:
+            allowArbitraryValues: false
+        domain:
+          title: Domain
+          type: string
+          description: Domain the component belongs to.
+          ui:field: SoContextualEntityPicker
+          ui:options:
+            allowArbitraryValues: false
+            catalogFilter:
+              - kind: Domain
+            defaultKind: Domain
+        system:
+          title: System
+          type: string
+          description: System the component belongs to.
+          ui:field: SoContextualEntityPicker
+          ui:options:
+            allowArbitraryValues: false
+            catalogFilter:
+              - kind: System
+                relations.partOf: "{{ parameters.domain }}"
+            defaultKind: System
+        account_id:
+          title: Account ID
+          type: string
+          description: Cloud account to deploy to
+          ui:field: SoContextualEntityPicker
+          ui:options:
+            allowArbitraryValues: false
+            catalogFilter:
+              - kind: Resource
+                relations.partOf: "{{ parameters.system }}"
+                spec.type: cloud-account
+            defaultKind: System
+    - title: Software configuration
+      required:
+        - hostname
+        - collection_name
+        - api_description
+        - nodejs_version
+      properties:
+        hostname:
+          title: Hostname
+          type: string
+          description: Site FQDN;  ex. api.app.serverlessops.io
+        collection_name:
+          title: Collection Name
+          type: string
+          description: Name of API collection; ex. /<collection_name>
+        api_description:
+          title: API Description
+          type: string
+          description: Description of the API
+        nodejs_version:
+          title: NodeJS Version
+          type: string
+          description: NodeJS version to use
+          default: '20'
+          enum:
+            - '20'
+            - '22'
+
+  steps:
+    - id: fetch
+      name: Fetch Entity References
+      action: catalog:fetch
+      input:
+        entityRefs:
+          - ${{ parameters.owner }}
+          - ${{ parameters.domain }}
+          - ${{ parameters.system }}
+          - ${{ parameters.account_id }}
+
+    - id: create-skeleton
+      name: Create project skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          domain_name: ${{ parameters.domain | parseEntityRef | pick('name') }}
+          system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
+          component_name: ${{ parameters.component_name }}
+          owner_name: ${{ parameters.system | parseEntityRef | pick('name') }}
+          description: ${{ parameters.description }}
+          api_description: ${{ parameters.api_description }}
+          hostname: ${{ parameters.hostname }}
+          collection_name: ${{ parameters.collection_name }}
+          github_org: ${{ parameters.github_org }}
+          lifecycle: ${{ parameters.lifecycle }}
+          nodejs_version: ${{ parameters.nodejs_version }}
+
+    - id: create-functions
+      name: Create project functions
+      action: fetch:template
+      input:
+        url: ./functions/crud
+        values:
+          domain_name: ${{ parameters.domain | parseEntityRef | pick('name') }}
+          system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
+          component_name: ${{ parameters.component_name }}
+          description: ${{ parameters.description }}
+
+    - id: cluster-pipeline
+      name: Create CI/CD pipeline
+      action: fetch:template
+      input:
+        url: ./pipeline
+        values:
+          domain_name: ${{ parameters.domain | parseEntityRef | pick('name') }}
+          system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
+          nodejs_version: ${{ parameters.nodejs_version }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        owner: tmclaugh
+        repoUrl: github.com?repo=${{ parameters.component_name }}&owner=${{ parameters.github_org }}
+        repoVisibility: public
+        protectDefaultBranch: false
+        requiredApprovingReviewCount: 0
+        description: ${{ parameters.description }}
+        gitAuthorName: ${{ user.entity.spec.profile.displayName }}
+        gitAuthorEmail:  ${{ user.entity.spec.profile.email }}
+        gitCommitMessage: "Initial commit via Backstage"
+        defaultBranch: main
+        secrets:
+          DEPLOYMENT_ACCOUNT_ID: ${{ steps.fetch.output.entities[3].metadata.title }}
+        topics:
+          - "domain:${{ parameters.domain | parseEntityRef | pick('name') }}"
+          - "system:${{ parameters.system | parseEntityRef | pick('name') }}"
+
+    - id: register
+      name: Register in Backstage
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"

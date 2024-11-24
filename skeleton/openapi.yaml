@@ -1,0 +1,411 @@
+---
+openapi: 3.0.3
+info:
+  title: ${{ values.component_name }}
+  description: |
+    ${{ values.api_description }}
+  version: 1.0.0
+servers:
+  - url:
+      Fn::Sub: "https://${Hostname}"
+    description: Production endpoint
+x-amazon-apigateway-request-validators:
+  all:
+    validateRequestBody: true
+    validateRequestParameters: true
+x-amazon-apigateway-request-validator: "all"
+
+paths:
+  "/health":
+    get:
+      summary: Health check
+      description: Get health of endpoint
+      parameters:
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheckResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/health.read
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          "application/json": |
+            {
+              "statusCode": 200
+            }
+        responses:
+          "200":
+            statusCode: 200
+            responseTemplates:
+              "application/json": |
+                {
+                  "healthy": true
+                }
+
+  "/${{ values.collection_name }}":
+    post:
+      summary: Create
+      description: Create ${{ values.collection_name }} item
+      parameters:
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Item"
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateItemResponse"
+        '400':
+          description: Client failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/${{ values.collection_name }}.write
+      x-amazon-apigateway-integration:
+        type: AWS_PROXY
+        httpMethod: POST
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateItemFunction.Arn}/invocations"
+
+  "/${{ values.collection_name }}/{id}":
+    get:
+      summary: List
+      description: List ${{ values.collection_name }} items
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          description: Offset to start from
+          schema:
+            type: integer
+            default: 0
+        - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entities:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Client failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '502':
+          description: Unexpected upstream error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/${{ values.collection_name }}.read
+      x-amazon-apigateway-integration:
+        type: AWS
+        httpMethod: POST
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query"
+        credentials:
+          Fn::Sub: ${RestApiIamRole.Arn}
+        passthroughBehavior: NEVER
+        requestTemplates:
+          "application/json":
+            Fn::Sub: |
+              {
+                "TableName": "${DdbTable}",
+                "KeyConditionExpression": "#pk = :pk",
+                "ExpressionAttributeValues": {
+                  ":pk": { "S": "$input.params('namespace')/$input.params('kind')" },
+                  ":itemType": { "S": "Item" }
+                },
+                "ExpressionAttributeNames": {
+                  "#pk": "pk",
+                  "#itemType": "itemType"
+                },
+                "FilterExpression": "#itemType = :itemType",
+                "ProjectionExpression": "sk"
+              }
+        responses:
+          "2\\d{2}":
+            statusCode: 200
+            responseTemplates:
+              "application/json": |
+                #set( $items = $input.path('$.Items') )
+                {
+                  "entities": [
+                  #foreach($element in $items)
+                    "$element.sk.S"#if($foreach.hasNext),#end
+
+                  #end
+                  ]
+                }
+          "4\\d{2}":
+            statusCode: 400
+            responseTemplates:
+              "application/json": |
+                {
+                  "message": "$input.path('$.Message')"
+                }
+          "5\\d{2}":
+            statusCode: 500
+            responseTemplates:
+              "application/json": |
+                {
+                  "message": "$input.path('$.Message')"
+                }
+          default:
+            statusCode: 502
+            responseTemplates:
+              "application/json": |
+                {
+                  "message": "$input.path('$.Message')"
+                }
+
+  "/${{ values.collection_name }}/{id}":
+    get:
+      summary: Get
+      description: Get ${{ values.collection_name }} item
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        '400':
+          description: Client failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/${{ values.collection_name }}.read
+      x-amazon-apigateway-integration:
+        type: AWS_PROXY
+        httpMethod: POST
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetItemFunction.Arn}/invocations"
+    delete:
+      summary: Delete
+      description: Delete ${{ values.collection_name }} item
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestIdResponse"
+        '400':
+          description: Client failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/${{ values.collection_name }}.write
+      x-amazon-apigateway-integration:
+        type: AWS_PROXY
+        httpMethod: POST
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteItemFunction.Arn}/invocations"
+    put:
+      summary: Update
+      description: Update ${{ values.collection_name }} item
+      parameters:
+        - $ref: "#/components/parameters/namespace"
+        - $ref: "#/components/parameters/id"
+        - $ref: "#/components/parameters/headerContentTypeJson"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Item"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestIdResponse"
+        '400':
+          description: Client failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      security:
+        - serverlessOpsCognitoPool:
+          - Fn::Sub: https://${Hostname}/${{ values.collection_name }}.write
+      x-amazon-apigateway-integration:
+        type: AWS_PROXY
+        httpMethod: POST
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpsertItemFunction.Arn}/invocations"
+
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        apiVersion:
+          type: string
+        kind:
+          type: string
+        metadata:
+          type: object
+          properties:
+            namespace:
+              type: string
+            name:
+              type: string
+            title:
+              type: string
+            annotations:
+              type: object
+          required:
+            - name
+          additionalProperties: true
+        spec:
+          type: object
+          properties:
+            owner:
+              type: string
+            type:
+              type: string
+          required:
+            - owner
+          additionalProperties: true
+      required:
+        - apiVersion
+        - kind
+        - metadata
+    CreateItemResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+      required:
+        - request_id
+    EmptyResponse:
+      type: object
+    RequestIdResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+      required:
+        - request_id
+    ErrorResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+      required:
+        - message
+    HealthCheckResponse:
+      type: object
+      properties:
+        healthy:
+          type: boolean
+      required:
+        - healthy
+  parameters:
+    id:
+      name: namespace
+      in: path
+      required: true
+      description: Item ID
+      schema:
+        type: string
+    headerContentTypeJson:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+        default: application/json; charset=utf-8
+  securitySchemes:
+    serverlessOpsCognitoPool:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: COGNITO_USER_POOLS
+      x-amazon-apigateway-authorizer:
+        type: COGNITO_USER_POOLS
+        providerARNs:
+          - Ref: CognitoUserPoolArn
+        identitySource: method.request.header.Authorization
+        # Not sure why this breaks requests. Leaving this here as a note to not enable this
+        # confoguration.
+        #identityValidationExpression: "^Bearer [^\\s]+$"
