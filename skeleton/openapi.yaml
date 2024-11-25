@@ -48,7 +48,7 @@ paths:
                   "healthy": true
                 }
 
-  "/${{ values.collection_name }}":
+  "${{ values.url_path_prefix }}/${{ values.collection_name }}":
     post:
       summary: Create
       description: Create ${{ values.collection_name }} item
@@ -204,7 +204,7 @@ paths:
                   "message": "$input.path('$.Message')"
                 }
 
-  "/${{ values.collection_name }}/{id}":
+  "${{ values.url_path_prefix }}/${{ values.collection_name }}/{id}":
     get:
       summary: Get
       description: Get ${{ values.collection_name }} item
@@ -407,5 +407,5 @@ components:
           - Ref: CognitoUserPoolArn
         identitySource: method.request.header.Authorization
         # Not sure why this breaks requests. Leaving this here as a note to not enable this
-        # confoguration.
+        # configuration.
         #identityValidationExpression: "^Bearer [^\\s]+$"

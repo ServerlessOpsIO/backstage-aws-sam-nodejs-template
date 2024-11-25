@@ -121,10 +121,15 @@ spec:
           title: Hostname
           type: string
           description: Site FQDN;  ex. api.app.serverlessops.io
+        url_path_prefix:
+          title: Path Prefix (without collection name)
+          type: string
+          description: Path prefix for API; ex. /v1
+          default: '/v1'
         collection_name:
           title: Collection Name
           type: string
-          description: Name of API collection; ex. /<collection_name>
+          description: Name of API collection; eg. <path_prefix>/<collection_name> -> /v1/thing
         api_description:
           title: API Description
           type: string
@@ -178,6 +183,7 @@ spec:
           system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
           component_name: ${{ parameters.component_name }}
           description: ${{ parameters.description }}
+          url_path_prefix: ${{ parameters.url_path_prefix }}
 
     - id: cluster-pipeline
       name: Create CI/CD pipeline
