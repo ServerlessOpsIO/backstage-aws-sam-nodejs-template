@@ -33,6 +33,8 @@
     "@backstage/catalog-model": "^1.7.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/aws-lambda": "^8.10.145",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.4",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.10.0",
     "esbuild": "^0.24.0",
