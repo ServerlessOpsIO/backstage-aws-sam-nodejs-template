@@ -19,7 +19,8 @@ apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
   name: ${{ values.component_name }}
-  description: ${{ valiues.api_description }}
+  description: |
+    ${{ values.api_description | indent(4) }}
 spec:
   type: openapi
   system: system:${{ values.system_name }}

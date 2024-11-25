@@ -129,6 +129,7 @@ spec:
           title: API Description
           type: string
           description: Description of the API
+          'ui:widget': 'textarea'
         nodejs_version:
           title: NodeJS Version
           type: string

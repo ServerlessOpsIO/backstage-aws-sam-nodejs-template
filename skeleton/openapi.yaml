@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: ${{ values.component_name }}
   description: |
-    ${{ values.api_description }}
+    ${{ values.api_description | indent(4) }}
   version: 1.0.0
 servers:
   - url:
