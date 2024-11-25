@@ -17,9 +17,9 @@
   },
   "packageManager": "yarn@4.4.1",
   "scripts": {
-    "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf dist .aws-sam",
     "compile": "node_modules/typescript/bin/tsc",
+    "compile:clean": "yarn run clean && yarn run compile",
     "compile:full": "node_modules/typescript/bin/tsc --skipLibCheck false --incremental false",
     "compile:watch": "node_modules/typescript/bin/tsc --watch",
     "lint": "eslint '--flag unstable_ts_config *.ts' --quiet --fix",
@@ -32,9 +32,6 @@
   "devDependencies": {
     "@backstage/catalog-model": "^1.7.0",
     "@tsconfig/node20": "^20.1.4",
-    "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.13",
-    "@types/node": "^22.7.7",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.10.0",
     "esbuild": "^0.24.0",

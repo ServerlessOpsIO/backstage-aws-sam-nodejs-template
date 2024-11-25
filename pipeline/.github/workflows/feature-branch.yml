@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: yarn install --immutable
 
-      - name: Assume AWS Credentials
+      - name: Assume AWS credentials
         uses: ServerlessOpsIO/gha-assume-aws-credentials@v1
         with:
           build_aws_account_id: {% raw %}${{ secrets.AWS_CICD_ACCOUNT_ID }}{% endraw %}
@@ -43,12 +43,12 @@ jobs:
       # TODO: Need to run tests when we have them
 
       - name: Compile Typescript
-        run: yarn run build
+        run: yarn run compile
 
-      - name: Build artifact
+      - name: Build deployment artifact
         run: yarn run sam:build
 
-      - name: Store Artifacts
+      - name: Store artifacts
         uses: ServerlessOpsIO/gha-store-artifacts@v1
         with:
           use_aws_sam: true
@@ -69,7 +69,7 @@ jobs:
         with:
           checkout_artifact: true
 
-      - name: Assume AWS Credentials
+      - name: Assume AWS credentials
         uses: ServerlessOpsIO/gha-assume-aws-credentials@v1
         with:
           build_aws_account_id: {% raw %}${{ secrets.AWS_CICD_ACCOUNT_ID }}{% endraw %}
