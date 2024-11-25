@@ -169,6 +169,7 @@ spec:
           api_description: ${{ parameters.api_description }}
           hostname: ${{ parameters.hostname }}
           collection_name: ${{ parameters.collection_name }}
+          collection_name_cap: ${{ parameters.collection_name | capitalize }}
           github_org: ${{ parameters.github_org }}
           lifecycle: ${{ parameters.lifecycle }}
           nodejs_version: ${{ parameters.nodejs_version }}
@@ -183,6 +184,7 @@ spec:
           system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
           component_name: ${{ parameters.component_name }}
           description: ${{ parameters.description }}
+          collection_name_cap: ${{ parameters.collection_name | capitalize }}
           url_path_prefix: ${{ parameters.url_path_prefix }}
 
     - id: cluster-pipeline

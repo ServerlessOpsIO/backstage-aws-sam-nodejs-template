@@ -17,7 +17,7 @@ import {
 } from '@aws-sdk/util-dynamodb'
 import { SuccessResponseType } from '../../lib/SuccessResponseType.js'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
-import { ItemKeys, ItemData, Item, createKeys, getKeys } from '../../lib/Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData, ${{ values.collection_name_cap }}Item, createKeys, getKeys } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
 const LOGGER = new Logger()
@@ -36,9 +36,9 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @returns void
  */
-export async function putItem(itemKeys: ItemKeys, itemDada: ItemData, upsert: boolean): Promise<void> {
+export async function putItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemDada: ${{ values.collection_name_cap }}ItemData, upsert: boolean): Promise<void> {
 
-    const item: Item = {
+    const item: ${{ values.collection_name_cap }}Item = {
         ...itemKeys,
         ...itemDada
     }
@@ -80,7 +80,7 @@ export async function handler_create (event: APIGatewayProxyEvent, context: Cont
 
     const request_id = context.awsRequestId
     const itemKeys = createKeys()
-    const itemData: ItemData = JSON.parse(event.body || '{}')
+    const itemData: ${{ values.collection_name_cap }}ItemData = JSON.parse(event.body || '{}')
 
     let statusCode: number
     let body: string
@@ -129,7 +129,7 @@ export async function handler_upsert (event: APIGatewayProxyEvent, context: Cont
     const id = event.pathParameters?.id as string
     const itemKeys = getKeys(id)
     // All already validated at gateway
-    const itemData: ItemData = JSON.parse(event.body || '{}')
+    const itemData: ${{ values.collection_name_cap }}ItemData = JSON.parse(event.body || '{}')
 
      /*
     // Validate requested ID against body data
@@ -138,7 +138,7 @@ export async function handler_upsert (event: APIGatewayProxyEvent, context: Cont
     ) {
         const response: ErrorResponseType = {
             error: 'BadRequest',
-            message: 'Item metadata does not match request path'
+            message: '${{ values.collection_name_cap }}Item metadata does not match request path'
         }
         return {
             statusCode: 400,

@@ -67,10 +67,10 @@ Resources:
       BillingMode: PAY_PER_REQUEST
 
   # Functions
-  CreateItemFunction:
+  Create${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/CreateItem
+      CodeUri: ./dist/handlers/Create${{ values.collection_name_cap }}Item
       Handler: function.handler_create
       Policies:
         - DynamoDBCrudPolicy:
@@ -88,18 +88,18 @@ Resources:
         EntryPoints:
           - function.js
 
-  CreateItemFunctionInvokePermission:
+  Create${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt CreateItemFunction.Arn
+      FunctionName: !GetAtt Create${{ values.collection_name_cap }}ItemFunction.Arn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
 
 
-  UpsertItemFunction:
+  Upsert${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/CreateItem
+      CodeUri: ./dist/handlers/Create${{ values.collection_name_cap }}Item
       Handler: function.handler_upsert
       Policies:
         - DynamoDBCrudPolicy:
@@ -117,18 +117,18 @@ Resources:
         EntryPoints:
           - function.js
 
-  UpsertItemFunctionInvokePermission:
+  Upsert${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt UpsertItemFunction.Arn
+      FunctionName: !GetAtt Upsert${{ values.collection_name_cap }}ItemFunction.Arn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
 
 
-  GetItemFunction:
+  Get${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/GetItem
+      CodeUri: ./dist/handlers/Get${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -146,18 +146,18 @@ Resources:
         EntryPoints:
           - function.js
 
-  GetItemFunctionInvokePermission:
+  Get${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt GetItemFunction.Arn
+      FunctionName: !GetAtt Get${{ values.collection_name_cap }}ItemFunction.Arn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
 
 
-  DeleteItemFunction:
+  Delete${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/DeleteItem
+      CodeUri: ./dist/handlers/Delete${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -175,10 +175,10 @@ Resources:
         EntryPoints:
           - function.js
 
-  DeleteItemFunctionInvokePermission:
+  Delete${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt DeleteItemFunction.Arn
+      FunctionName: !GetAtt Delete${{ values.collection_name_cap }}ItemFunction.Arn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
 

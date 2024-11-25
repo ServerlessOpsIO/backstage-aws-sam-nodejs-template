@@ -14,7 +14,7 @@ import {
 } from '@aws-sdk/client-dynamodb'
 import { SuccessResponseType } from '../../lib/SuccessResponseType.js'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
-import { ItemKeys, getKeys } from '../../lib/Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, getKeys } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
 const LOGGER = new Logger()
@@ -31,7 +31,7 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @returns Promise<void>
  */
-export async function deleteItem(itemKeys: ItemKeys): Promise<void> {
+export async function deleteItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys): Promise<void> {
     const params: DeleteItemCommandInput = {
         TableName: DDB_TABLE_NAME,
         Key: {

@@ -59,7 +59,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Item"
+              $ref: "#/components/schemas/${{ values.collection_name_cap }}Item"
 
       responses:
         '201':
@@ -67,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateItemResponse"
+                $ref: "#/components/schemas/Create${{ values.collection_name_cap }}ItemResponse"
         '400':
           description: Client failure
           content:
@@ -87,7 +87,7 @@ paths:
         type: AWS_PROXY
         httpMethod: POST
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateItemFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Create${{ values.collection_name_cap }}ItemFunction.Arn}/invocations"
 
   "${{ values.url_path_prefix }}/${{ values.collection_name }}/{id}":
     get:
@@ -102,7 +102,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: "#/components/schemas/${{ values.collection_name_cap }}Item"
         '400':
           description: Client failure
           content:
@@ -122,7 +122,7 @@ paths:
         type: AWS_PROXY
         httpMethod: POST
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetItemFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Get${{ values.collection_name_cap }}ItemFunction.Arn}/invocations"
     delete:
       summary: Delete
       description: Delete ${{ values.collection_name }} item
@@ -155,7 +155,7 @@ paths:
         type: AWS_PROXY
         httpMethod: POST
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteItemFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Delete${{ values.collection_name_cap }}ItemFunction.Arn}/invocations"
     put:
       summary: Update
       description: Update ${{ values.collection_name }} item
@@ -167,7 +167,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Item"
+              $ref: "#/components/schemas/${{ values.collection_name_cap }}Item"
       responses:
         '200':
           description: Success
@@ -194,11 +194,11 @@ paths:
         type: AWS_PROXY
         httpMethod: POST
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpsertItemFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Upsert${{ values.collection_name_cap }}ItemFunction.Arn}/invocations"
 
 components:
   schemas:
-    Item:
+    ${{ values.collection_name_cap }}Item:
       type: object
       properties:
         apiVersion:
