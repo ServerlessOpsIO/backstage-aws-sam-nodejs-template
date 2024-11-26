@@ -4,8 +4,6 @@ ${{ values.description }}
 
 The full API can be found in the [OpenAPI document](./openapi.yaml).
 
-### Examples
-
 ## Architecture
 This is an AWS serverless service. It is built on top of the following AWS services:
 * API Gateway

@@ -29,6 +29,12 @@ jobs:
         shell: bash
         run: yarn install --immutable
 
+      - name: Compile Typescript
+        run: yarn run compile
+
+      - name: Run unit tests
+        run: yarn run test:unit
+
       - name: Assume AWS credentials
         uses: ServerlessOpsIO/gha-assume-aws-credentials@v1
         with:
@@ -39,11 +45,6 @@ jobs:
 
       - name: Validate template
         run: sam validate --lint
-
-      # TODO: Need to run tests when we have them
-
-      - name: Compile Typescript
-        run: yarn run compile
 
       - name: Build deployment artifact
         run: yarn run sam:build
