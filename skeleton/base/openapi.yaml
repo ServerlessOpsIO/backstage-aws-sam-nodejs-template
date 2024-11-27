@@ -67,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Create${{ values.collection_name_cap }}ItemResponse"
+                $ref: "#/components/schemas/Create${{ values.collection_name_cap }}Response"
         '400':
           description: Client failure
           content:
@@ -233,13 +233,13 @@ components:
         - apiVersion
         - kind
         - metadata
-    CreateItemResponse:
+    Create${{ values.collection_name_cap }}Response:
       type: object
       properties:
         request_id:
           type: string
       required:
-        - request_id
+        - id
     EmptyResponse:
       type: object
     RequestIdResponse:

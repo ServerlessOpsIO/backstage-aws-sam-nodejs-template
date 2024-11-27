@@ -10,7 +10,15 @@ import {
 import {
     marshall
 } from '@aws-sdk/util-dynamodb'
+
 import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData } from '../../lib/${{ values.collection_name_cap }}Item.js'
+jest.mock('../../lib/${{ values.collection_name_cap }}Item.js', () => {
+    return {
+        ...jest.requireActual('../../lib/${{ values.collection_name_cap }}Item.js'),
+        createKeys: jest.fn(() => ({ pk: 'id', sk: 'id' })),
+        getKeys: jest.fn(() => ({ pk: 'id', sk: 'id' })),
+    }
+})
 
 // Mock clients
 const mockDdbClient = mockClient(DynamoDBClient)
@@ -107,7 +115,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
             test('createing item', async () => {
                 const result = await func.handler_create(event, context)
                 expect(result.statusCode).toBe(201)
-                expect(JSON.parse(result.body)).toEqual({ request_id: 'request-id' })
+                expect(JSON.parse(result.body)).toEqual({ id: 'request-id' })
             })
         })
 
