@@ -18,7 +18,13 @@ import {
 import { CreateResponseType } from '../../lib/CreateResponseType.js'
 import { SuccessResponseType } from '../../lib/SuccessResponseType.js'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
-import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData, ${{ values.collection_name_cap }}Item, createKeys, getKeys } from '../../lib/${{ values.collection_name_cap }}Item.js'
+import {
+    ${{ values.collection_name_cap }}ItemKeys,
+    ${{ values.collection_name_cap }}Data,
+    ${{ values.collection_name_cap }}Item,
+    createKeys,
+    getKeys
+} from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
 const LOGGER = new Logger()
@@ -37,7 +43,7 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @returns void
  */
-export async function putItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemDada: ${{ values.collection_name_cap }}ItemData, upsert: boolean): Promise<void> {
+export async function putItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemDada: ${{ values.collection_name_cap }}Data, upsert: boolean): Promise<void> {
 
     const item: ${{ values.collection_name_cap }}Item = {
         ...itemKeys,
@@ -80,7 +86,8 @@ export async function handler_create (event: APIGatewayProxyEvent, context: Cont
     LOGGER.debug('Received event', { event })
 
     const itemKeys = createKeys()
-    const itemData: ${{ values.collection_name_cap }}ItemData = JSON.parse(event.body || '{}')
+    const itemData: ${{ values.collection_name_cap }}Data = JSON.parse(event.body || '{}')
+    itemData.id = itemKeys.pk
 
     let statusCode: number
     let body: string
@@ -129,12 +136,11 @@ export async function handler_upsert (event: APIGatewayProxyEvent, context: Cont
     const id = event.pathParameters?.id as string
     const itemKeys = getKeys(id)
     // All already validated at gateway
-    const itemData: ${{ values.collection_name_cap }}ItemData = JSON.parse(event.body || '{}')
+    const itemData: ${{ values.collection_name_cap }}Data = JSON.parse(event.body || '{}')
 
-     /*
     // Validate requested ID against body data
     if (
-        itemData. !== event.pathParameters?.id
+        itemData.id !== event.pathParameters?.id
     ) {
         const response: ErrorResponseType = {
             error: 'BadRequest',
@@ -145,7 +151,6 @@ export async function handler_upsert (event: APIGatewayProxyEvent, context: Cont
             body: JSON.stringify(response)
         }
     }
-    */
 
     let statusCode: number
     let body: string

@@ -11,7 +11,7 @@ import {
     marshall
 } from '@aws-sdk/util-dynamodb'
 
-import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData } from '../../lib/${{ values.collection_name_cap }}Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}Data } from '../../lib/${{ values.collection_name_cap }}Item.js'
 jest.mock('../../lib/${{ values.collection_name_cap }}Item.js', () => {
     return {
         ...jest.requireActual('../../lib/${{ values.collection_name_cap }}Item.js'),
@@ -41,7 +41,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
 
     describe('putItem()', () => {
         let itemKeys: ${{ values.collection_name_cap }}ItemKeys
-        let itemData: ${{ values.collection_name_cap }}ItemData
+        let itemData: ${{ values.collection_name_cap }}Data
 
         beforeEach(() => {
             itemKeys = { pk: 'pk', sk: 'sk' }
@@ -167,7 +167,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
         beforeEach(() => {
 
             event = {
-                body: JSON.stringify({ data: 'data' }),
+                body: JSON.stringify({ id: 'id', data: 'data' }),
                 headers: {},
                 multiValueHeaders: {},
                 httpMethod: 'PUT',
@@ -190,7 +190,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
                 expect(mockDdbClient).toHaveReceivedCommandWith(
                     PutItemCommand,
                     {
-                        Item: marshall({pk: 'id', sk: 'id', data: 'data'})
+                        Item: marshall({pk: 'id', sk: 'id', id: 'id', data: 'data'})
                     }
                 )
 
@@ -200,7 +200,12 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
         })
 
         describe('should fail when', () => {
-            test.skip('failure case', async () => {})
+            test('pathParameter id does not match data id', async () => {
+                event.pathParameters = { id: 'other-id' }
+
+                const result = await func.handler_upsert(event, context)
+                expect(result.statusCode).toBe(400)
+            })
 
             test('DDB client error; returns 400', async () => {
                 mockDdbClient

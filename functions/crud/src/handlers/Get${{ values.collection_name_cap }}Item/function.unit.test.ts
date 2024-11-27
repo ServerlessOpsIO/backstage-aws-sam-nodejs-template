@@ -10,7 +10,7 @@ import {
 import {
     marshall
 } from '@aws-sdk/util-dynamodb'
-import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData } from '../../lib/${{ values.collection_name_cap }}Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}Data } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Mock clients
 const mockDdbClient = mockClient(DynamoDBClient)
@@ -33,7 +33,7 @@ describe('Get${{ values.collection_name_cap }}Item', () => {
 
     describe('getItem()', () => {
         let itemKeys: ${{ values.collection_name_cap }}ItemKeys
-        let itemData: ${{ values.collection_name_cap }}ItemData
+        let itemData: ${{ values.collection_name_cap }}Data
 
         beforeEach(() => {
             itemKeys = { pk: 'pk', sk: 'sk' }

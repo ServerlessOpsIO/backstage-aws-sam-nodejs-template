@@ -201,38 +201,11 @@ components:
     ${{ values.collection_name_cap }}Item:
       type: object
       properties:
-        apiVersion:
+        id:
           type: string
-        kind:
-          type: string
-        metadata:
-          type: object
-          properties:
-            namespace:
-              type: string
-            name:
-              type: string
-            title:
-              type: string
-            annotations:
-              type: object
-          required:
-            - name
-          additionalProperties: true
-        spec:
-          type: object
-          properties:
-            owner:
-              type: string
-            type:
-              type: string
-          required:
-            - owner
-          additionalProperties: true
       required:
-        - apiVersion
-        - kind
-        - metadata
+        - id
+      additionalProperties: true
     Create${{ values.collection_name_cap }}Response:
       type: object
       properties:

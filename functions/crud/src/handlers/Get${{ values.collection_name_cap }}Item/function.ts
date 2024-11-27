@@ -17,7 +17,11 @@ import {
     unmarshall
 } from '@aws-sdk/util-dynamodb'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
-import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}ItemData, getKeys } from '../../lib/${{ values.collection_name_cap }}Item.js'
+import {
+    ${{ values.collection_name_cap }}ItemKeys,
+    ${{ values.collection_name_cap }}Data,
+    getKeys
+} from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
 const LOGGER = new Logger()
@@ -32,9 +36,9 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @param itemKeys - The primary key and sort key of the item.
  *
- * @returns Promise<${{ values.collection_name_cap }}ItemData>
+ * @returns Promise<${{ values.collection_name_cap }}IData>
  */
-export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys): Promise<${{ values.collection_name_cap }}ItemData> {
+export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys): Promise<${{ values.collection_name_cap }}Data> {
     const params: GetItemCommandInput = {
         TableName: DDB_TABLE_NAME,
         Key: {
@@ -64,7 +68,7 @@ export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKey
         throw new Error('${{ values.collection_name_cap }}Item not found')
     }
 
-    return unmarshall(output.Item) as ${{ values.collection_name_cap }}ItemData
+    return unmarshall(output.Item) as ${{ values.collection_name_cap }}Data
 }
 
 
@@ -85,7 +89,7 @@ export async function handler (event: APIGatewayProxyEvent, _: Context): Promise
     let statusCode: number
     let body: string
     try {
-        const itemData: ${{ values.collection_name_cap }}ItemData = await getItem(
+        const itemData: ${{ values.collection_name_cap }}Data = await getItem(
             itemKeys,
         )
         statusCode = 200
