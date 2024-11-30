@@ -43,11 +43,11 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @returns void
  */
-export async function putItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemDada: ${{ values.collection_name_cap }}Data, upsert: boolean): Promise<void> {
+export async function putItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemData: ${{ values.collection_name_cap }}Data, upsert: boolean): Promise<void> {
 
     const item: ${{ values.collection_name_cap }}Item = {
         ...itemKeys,
-        ...itemDada
+        ...itemData
     }
 
     const params: PutItemCommandInput = {
