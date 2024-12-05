@@ -204,6 +204,7 @@ spec:
           system_name: ${{ parameters.system | parseEntityRef | pick('name') }}
           component_name: ${{ parameters.component_name }}
           description: ${{ parameters.description }}
+          collection_name: ${{ parameters.collection_name | capitalize }}
           collection_name_cap: ${{ parameters.collection_name | capitalize }}
           url_path_prefix: ${{ parameters.url_path_prefix }}
 
