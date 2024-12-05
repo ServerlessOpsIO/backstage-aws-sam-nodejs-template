@@ -85,7 +85,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
         })
     })
 
-    describe('handler_create()', () => {
+    describe('handler()', () => {
         let event: APIGatewayProxyEvent
         let context: Context
 
