@@ -14,10 +14,7 @@ import {
 } from '@aws-sdk/client-dynamodb'
 import { SuccessResponseType } from '../../lib/SuccessResponseType.js'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
-import {
-    ${{ values.collection_name_cap }}ItemKeys,
-    getKeys
-} from '../../lib/${{ values.collection_name_cap }}Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, getKeysFromId } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
 const LOGGER = new Logger()
@@ -67,12 +64,12 @@ export async function deleteItem(itemKeys: ${{ values.collection_name_cap }}Item
  *
  * @returns Promise<APIGatewayProxyResult>
  */
-export async function handler (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
     LOGGER.debug('Received event', { event })
     const event_id = context.awsRequestId
 
     const id = event.pathParameters?.id as string
-    const itemKeys = getKeys(id)
+    const itemKeys = getKeysFromId(id)
 
     let statusCode: number
     let body: string

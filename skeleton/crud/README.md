@@ -25,7 +25,7 @@ The database is a DDB table with a primary key composed of a partition key and s
 
 The starter code assumes the values of _pk_ and _sk_ are the same value and their value is the same as the API's `id` path parameter. When creating new resources the starter code will dynamically create a UUID as the value for `pk` and `sk`.
 
-If you expect to have multiple types of data stored in the same table you should consider using compound key values for _pk_ and _sk_. These are keys where the values are prefixed with a string indicating the data type. For example, prefixing the value with the collection name. eg. _thing#1234_. See the _Code_ section for more information on implimenting this.
+If you expect to have multiple types of data stored in the same table you should consider using compound key values for _pk_ and _sk_. These are keys where the values are prefixed with a string indicating the data type. For example, prefixing the value with the collection name. eg. _${{ values.collection_name }}#1234_. See the _Code_ section for more information on implimenting this.
 
 
 ### Code

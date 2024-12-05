@@ -20,7 +20,7 @@ import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
 import {
     ${{ values.collection_name_cap }}ItemKeys,
     ${{ values.collection_name_cap }}Data,
-    getKeys
+    getKeysFromId
 } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Initialize Logger
@@ -36,7 +36,7 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @param itemKeys - The primary key and sort key of the item.
  *
- * @returns Promise<${{ values.collection_name_cap }}IData>
+ * @returns Promise<${{ values.collection_name_cap }}ItemData>
  */
 export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys): Promise<${{ values.collection_name_cap }}Data> {
     const params: GetItemCommandInput = {
@@ -45,7 +45,7 @@ export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKey
             'pk': { S: itemKeys.pk },
             'sk': { S: itemKeys.sk }
         },
-        ProjectionExpression: 'apiVersion, kind, metadata, spec'
+        //ProjectionExpression: 'key1, key2, key3',
     }
 
     let output: GetItemCommandOutput
@@ -64,9 +64,13 @@ export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKey
 
     // This here I believe just to satisfy TypeScript. DDB should throw an error when the item
     // is not found
-    if ( typeof output.Item == 'undefined' ) {
+    if (typeof output.Item == 'undefined') {
         throw new Error('${{ values.collection_name_cap }}Item not found')
     }
+
+    // remove DDB keys
+    delete output.Item.pk
+    delete output.Item.sk
 
     return unmarshall(output.Item) as ${{ values.collection_name_cap }}Data
 }
@@ -80,11 +84,11 @@ export async function getItem(itemKeys: ${{ values.collection_name_cap }}ItemKey
  *
  * @returns Promise<APIGatewayProxyResult>
  */
-export async function handler (event: APIGatewayProxyEvent, _: Context): Promise<APIGatewayProxyResult> {
+export async function handler(event: APIGatewayProxyEvent, _: Context): Promise<APIGatewayProxyResult> {
     LOGGER.debug('Received event', { event })
 
     const id = event.pathParameters?.id as string
-    const itemKeys = getKeys(id)
+    const itemKeys = getKeysFromId(id)
 
     let statusCode: number
     let body: string

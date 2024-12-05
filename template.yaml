@@ -192,6 +192,7 @@ spec:
           github_org: ${{ parameters.github_org }}
           lifecycle: ${{ parameters.lifecycle }}
           nodejs_version: ${{ parameters.nodejs_version }}
+          url_path_prefix: ${{ parameters.url_path_prefix }}
 
     - id: create-functions
       name: Create project functions

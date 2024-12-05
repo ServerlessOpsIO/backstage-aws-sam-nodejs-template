@@ -7,12 +7,15 @@ import {
     ConditionalCheckFailedException,
     DynamoDBServiceException
 } from '@aws-sdk/client-dynamodb'
+import {
+    marshall
+} from '@aws-sdk/util-dynamodb'
 
-import { ${{ values.collection_name_cap }}Data } from '../../lib/${{ values.collection_name_cap }}Item.js'
+import { ${{ values.collection_name_cap }}ItemKeys, ${{ values.collection_name_cap }}Data } from '../../lib/${{ values.collection_name_cap }}Item.js'
 jest.mock('../../lib/${{ values.collection_name_cap }}Item.js', () => {
     return {
         ...jest.requireActual('../../lib/${{ values.collection_name_cap }}Item.js'),
-        createKeys: jest.fn(() => ({ pk: '${{ values.collection_name }}#1234', sk: '${{ values.collection_name }}#1234' })),
+        getKeysFromId: jest.fn(() => ({ pk: '${{ values.collection_name }}#1234', sk: '${{ values.collection_name }}#1234' })),
         getIdFromKeys: jest.fn(() => '1234')
     }
 })
@@ -38,9 +41,11 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
     afterEach(() => { })
 
     describe('putItem()', () => {
+        let itemKeys: ${{ values.collection_name_cap }}ItemKeys
         let itemData: ${{ values.collection_name_cap }}Data
 
         beforeEach(() => {
+            itemKeys = { pk: 'pk', sk: 'sk' }
             itemData = { data: 'data' }
         })
 
@@ -51,7 +56,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
                     .on(PutItemCommand)
                     .resolves({})
 
-                await func.createItem(itemData)
+                await func.upsertItem(itemKeys, itemData, false)
 
                 expect(mockDdbClient).toHaveReceivedCommand(PutItemCommand)
             })
@@ -60,7 +65,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
                     .on(PutItemCommand)
                     .resolves({})
 
-                await func.createItem(itemData)
+                await func.upsertItem(itemKeys, itemData, true)
 
                 expect(mockDdbClient).toHaveReceivedCommand(PutItemCommand)
             })
@@ -76,7 +81,7 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
                     }))
 
                 await expect(
-                    func.createItem(itemData)
+                    func.upsertItem(itemKeys, itemData, true)
                 ).rejects.toThrow(ConditionalCheckFailedException)
 
                 expect(mockDdbClient).toHaveReceivedCommand(PutItemCommand)
@@ -85,19 +90,21 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
         })
     })
 
-    describe('handler_create()', () => {
+
+    describe('handler()', () => {
         let event: APIGatewayProxyEvent
         let context: Context
 
         beforeEach(() => {
+
             event = {
-                body: JSON.stringify({ data: 'data' }),
+                body: JSON.stringify({ id: 'id', data: 'data' }),
                 headers: {},
                 multiValueHeaders: {},
-                httpMethod: 'POST',
+                httpMethod: 'PUT',
                 isBase64Encoded: false,
                 path: '',
-                pathParameters: null,
+                pathParameters: { id: 'id' },
                 queryStringParameters: null,
                 multiValueQueryStringParameters: null,
                 stageVariables: null,
@@ -108,25 +115,31 @@ describe('Create${{ values.collection_name_cap }}Item', () => {
         })
 
         describe('should succeed when', () => {
-            test('createing item', async () => {
+            test('upserting item', async () => {
                 const result = await func.handler(event, context)
-                expect(result.statusCode).toBe(201)
-                expect(JSON.parse(result.body)).toEqual({ id: '1234' })
+
+                expect(mockDdbClient).toHaveReceivedCommandWith(
+                    PutItemCommand,
+                    {
+                        Item: marshall({ pk: '${{ values.collection_name }}#1234', sk: '${{ values.collection_name }}#1234', id: '1234', data: 'data' }),
+                        ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk)',
+                        TableName: ''
+                    }
+                )
+
+                expect(result.statusCode).toBe(200)
+                expect(JSON.parse(result.body)).toEqual({ request_id: 'request-id' })
             })
         })
 
         describe('should fail when', () => {
-            test('creating existing item', async () => {
-                mockDdbClient
-                    .on(PutItemCommand)
-                    .rejects(new ConditionalCheckFailedException({
-                        $metadata: {},
-                        message: 'The conditional request failed',
-                    }))
+            test('pathParameter id does not match data id', async () => {
+                event.pathParameters = { id: 'other-id' }
 
                 const result = await func.handler(event, context)
                 expect(result.statusCode).toBe(400)
             })
+
             test('DDB client error; returns 400', async () => {
                 mockDdbClient
                     .on(PutItemCommand)

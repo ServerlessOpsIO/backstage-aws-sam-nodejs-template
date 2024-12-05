@@ -15,12 +15,13 @@ import {
 import {
     marshall
 } from '@aws-sdk/util-dynamodb'
-import { CreateResponseType } from '../../lib/CreateResponseType.js'
+import { SuccessResponseType } from '../../lib/SuccessResponseType.js'
 import { ErrorResponseType } from '../../lib/ErrorResponseType.js'
 import {
+    ${{ values.collection_name_cap }}ItemKeys,
     ${{ values.collection_name_cap }}Data,
     ${{ values.collection_name_cap }}Item,
-    createKeys,
+    getKeysFromId,
     getIdFromKeys
 } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
@@ -37,17 +38,15 @@ const DDB_TABLE_NAME = process.env.DDB_TABLE_NAME || ''
  *
  * @param itemKeys - The primary key and sort key of the item.
  * @param itemData - The data to be stored in the item.
+ * @param upsert - If true, the item will be updated if it already exists.
  *
  * @returns void
  */
-export async function createItem(itemData: ${{ values.collection_name_cap }}Data): Promise<string> {
-
-    const itemKeys = createKeys()
+export async function upsertItem(itemKeys: ${{ values.collection_name_cap }}ItemKeys, itemData: ${{ values.collection_name_cap }}Data, upsert: boolean): Promise<void> {
     const itemDataWithId = {
         ...itemData,
         id: getIdFromKeys(itemKeys)
     }
-
     const item: ${{ values.collection_name_cap }}Item = {
         ...itemKeys,
         ...itemDataWithId
@@ -56,7 +55,7 @@ export async function createItem(itemData: ${{ values.collection_name_cap }}Data
     const params: PutItemCommandInput = {
         TableName: DDB_TABLE_NAME,
         Item: marshall(item),
-        ConditionExpression: 'attribute_not_exists(pk) AND attribute_not_exists(sk)'
+        ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk)'
     }
 
     try {
@@ -71,13 +70,11 @@ export async function createItem(itemData: ${{ values.collection_name_cap }}Data
         })
         throw error
     }
-
-    return itemDataWithId.id
 }
 
 
 /**
- * Event handler for create (POST) API operations
+ * Event handler for upsert (PUT) API operations
  *
  * @param event - The API Gateway event
  * @param context - The Lambda runtime context
@@ -87,16 +84,33 @@ export async function createItem(itemData: ${{ values.collection_name_cap }}Data
 export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
     LOGGER.debug('Received event', { event })
 
+    const event_id = context.awsRequestId
+    const id = event.pathParameters?.id as string
+    const itemKeys = getKeysFromId(id)
+    // All already validated at gateway
     const itemData: ${{ values.collection_name_cap }}Data = JSON.parse(event.body || '{}')
+
+    // Validate requested ID against body data
+    if (
+        itemData.id !== event.pathParameters?.id
+    ) {
+        const response: ErrorResponseType = {
+            error: 'BadRequest',
+            message: '${{ values.collection_name_cap }}Item metadata does not match request path'
+        }
+        return {
+            statusCode: 400,
+            body: JSON.stringify(response)
+        }
+    }
 
     let statusCode: number
     let body: string
     try {
-        const id = await createItem(itemData as ${{ values.collection_name_cap }}Data)
-        statusCode = 201
-        const response: CreateResponseType = { "id": id }
+        await upsertItem(itemKeys, itemData, true)
+        statusCode = 200
+        const response: SuccessResponseType = { "request_id": event_id }
         body = JSON.stringify(response)
-
     } catch (error) {
         LOGGER.error("Operation failed", { event })
         const fault = (<DynamoDBServiceException>error).$fault

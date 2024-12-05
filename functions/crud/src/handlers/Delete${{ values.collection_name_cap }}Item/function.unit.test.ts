@@ -5,14 +5,15 @@ import {
     DynamoDBClient,
     DeleteItemCommand,
     ConditionalCheckFailedException,
-    DynamoDBServiceException 
- } from '@aws-sdk/client-dynamodb'
+    DynamoDBServiceException
+} from '@aws-sdk/client-dynamodb'
 import {
     marshall
 } from '@aws-sdk/util-dynamodb'
 import { ${{ values.collection_name_cap }}ItemKeys } from '../../lib/${{ values.collection_name_cap }}Item.js'
 
 // Mock clients
+const mockDdbTableName = 'mockTable'
 const mockDdbClient = mockClient(DynamoDBClient)
 
 // Function under test
@@ -29,7 +30,7 @@ describe('Delete${{ values.collection_name_cap }}Item', () => {
         mockDdbClient.reset()
     })
 
-    afterEach(() => {})
+    afterEach(() => { })
 
     describe('deleteItem()', () => {
         let itemKeys: ${{ values.collection_name_cap }}ItemKeys
@@ -96,10 +97,13 @@ describe('Delete${{ values.collection_name_cap }}Item', () => {
             test('deleting item', async () => {
                 const result = await func.handler(event, context)
 
+                const mockItem = { pk: '${{ values.collection_name }}#id', sk: '${{ values.collection_name }}#id' }
+
                 expect(mockDdbClient).toHaveReceivedCommandWith(
                     DeleteItemCommand,
                     {
-                        Key: marshall({pk: 'id', sk: 'id'})
+                        Key: marshall(mockItem),
+                        ConditionExpression: 'attribute_exists(pk) AND attribute_exists(sk)'
                     }
                 )
 

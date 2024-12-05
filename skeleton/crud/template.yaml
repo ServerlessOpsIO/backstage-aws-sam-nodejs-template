@@ -71,7 +71,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./dist/handlers/Create${{ values.collection_name_cap }}Item
-      Handler: function.handler_create
+      Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref DdbTable
@@ -99,8 +99,8 @@ Resources:
   Upsert${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/Create${{ values.collection_name_cap }}Item
-      Handler: function.handler_upsert
+      CodeUri: ./dist/handlers/Upsert${{ values.collection_name_cap }}Item
+      Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref DdbTable
