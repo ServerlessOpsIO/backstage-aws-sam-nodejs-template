@@ -148,10 +148,9 @@ spec:
           title: NodeJS Version
           type: string
           description: NodeJS version to use
-          default: '20'
+          default: '24'
           enum:
-            - '20'
-            - '22'
+            - '24'
 
   steps:
     - id: fetch

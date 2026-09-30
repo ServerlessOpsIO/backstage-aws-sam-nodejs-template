@@ -70,7 +70,7 @@ Resources:
   Create${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/Create${{ values.collection_name_cap }}Item
+      CodeUri: ./src/handlers/Create${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -78,15 +78,15 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
-        Target: "es2020"
+        Minify: !Ref EnableMinify
+        Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
         Sourcemap: !Ref EnableSourceMaps
         OutExtension:
           - .js=.mjs
         EntryPoints:
-          - function.js
+          - function.ts
 
   Create${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
@@ -99,7 +99,7 @@ Resources:
   Upsert${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/Upsert${{ values.collection_name_cap }}Item
+      CodeUri: ./src/handlers/Upsert${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -107,15 +107,15 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
-        Target: "es2020"
+        Minify: !Ref EnableMinify
+        Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
         Sourcemap: !Ref EnableSourceMaps
         OutExtension:
           - .js=.mjs
         EntryPoints:
-          - function.js
+          - function.ts
 
   Upsert${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
@@ -128,7 +128,7 @@ Resources:
   Get${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/Get${{ values.collection_name_cap }}Item
+      CodeUri: ./src/handlers/Get${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -136,15 +136,15 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
-        Target: "es2020"
+        Minify: !Ref EnableMinify
+        Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
         Sourcemap: !Ref EnableSourceMaps
         OutExtension:
           - .js=.mjs
         EntryPoints:
-          - function.js
+          - function.ts
 
   Get${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
@@ -157,7 +157,7 @@ Resources:
   Delete${{ values.collection_name_cap }}ItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./dist/handlers/Delete${{ values.collection_name_cap }}Item
+      CodeUri: ./src/handlers/Delete${{ values.collection_name_cap }}Item
       Handler: function.handler
       Policies:
         - DynamoDBCrudPolicy:
@@ -165,15 +165,15 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
-        Target: "es2020"
+        Minify: !Ref EnableMinify
+        Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
         Sourcemap: !Ref EnableSourceMaps
         OutExtension:
           - .js=.mjs
         EntryPoints:
-          - function.js
+          - function.ts
 
   Delete${{ values.collection_name_cap }}ItemFunctionInvokePermission:
     Type: AWS::Lambda::Permission
