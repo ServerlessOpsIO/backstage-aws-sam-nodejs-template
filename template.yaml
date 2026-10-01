@@ -230,7 +230,6 @@ spec:
       name: Publish to GitHub
       action: publish:github
       input:
-        owner: tmclaugh
         repoUrl: github.com?repo=${{ parameters.component_name }}&owner=${{ parameters.github_org }}
         repoVisibility: public
         protectDefaultBranch: false
