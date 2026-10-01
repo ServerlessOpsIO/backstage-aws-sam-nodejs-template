@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: yarn install --immutable
+        run: yarn install
 
       - name: Compile Typescript
         run: yarn run compile
