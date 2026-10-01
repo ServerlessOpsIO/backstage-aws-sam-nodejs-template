@@ -18,7 +18,7 @@ jobs:
         uses: ServerlessOpsIO/gha-setup-workspace@v2
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '${{ values.nodejs_version }}'
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: yarn install --immutable
+        run: yarn install
 
       - name: Compile Typescript
         run: yarn run compile

@@ -148,10 +148,9 @@ spec:
           title: NodeJS Version
           type: string
           description: NodeJS version to use
-          default: '20'
+          default: '24'
           enum:
-            - '20'
-            - '22'
+            - '24'
 
   steps:
     - id: fetch
@@ -231,7 +230,6 @@ spec:
       name: Publish to GitHub
       action: publish:github
       input:
-        owner: tmclaugh
         repoUrl: github.com?repo=${{ parameters.component_name }}&owner=${{ parameters.github_org }}
         repoVisibility: public
         protectDefaultBranch: false
@@ -243,9 +241,10 @@ spec:
         defaultBranch: main
         secrets:
           DEPLOYMENT_ACCOUNT_ID: ${{ steps.fetch.output.entities[3].metadata.title }}
-        topics:
-          - "domain:${{ parameters.domain | parseEntityRef | pick('name') }}"
-          - "system:${{ parameters.system | parseEntityRef | pick('name') }}"
+        customProperties:
+          system: ${{ parameters.system | parseEntityRef | pick('name') }}
+          domain: ${{ parameters.domain | parseEntityRef | pick('name') }}
+          owner: ${{ parameters.owner | parseEntityRef | pick('name') }}
 
     - id: register
       name: Register in Backstage

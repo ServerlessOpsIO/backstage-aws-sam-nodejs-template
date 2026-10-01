@@ -4,7 +4,11 @@
     "outDir": "dist",
     "rootDir": "./src",
     "sourceMap": true,
-    "target": "es2022"
+    "target": "es2022",
+    "types": [
+      "node",
+      "jest"
+    ]
   },
   "include": [
     "src"
