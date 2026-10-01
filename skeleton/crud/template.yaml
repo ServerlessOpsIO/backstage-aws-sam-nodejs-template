@@ -32,11 +32,6 @@ Parameters:
     Type: String
     Description: Cognito User Pool ARN
 
-  EnableSourceMaps:
-    Type: String
-    Description: Enable source maps for debugging
-    Default: false
-
 
 Globals:
   Function:
@@ -78,11 +73,11 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: !Ref EnableMinify
+        Minify: true
         Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
-        Sourcemap: !Ref EnableSourceMaps
+        Sourcemap: false
         OutExtension:
           - .js=.mjs
         EntryPoints:
@@ -107,11 +102,11 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: !Ref EnableMinify
+        Minify: true
         Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
-        Sourcemap: !Ref EnableSourceMaps
+        Sourcemap: false
         OutExtension:
           - .js=.mjs
         EntryPoints:
@@ -136,11 +131,11 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: !Ref EnableMinify
+        Minify: true
         Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
-        Sourcemap: !Ref EnableSourceMaps
+        Sourcemap: false
         OutExtension:
           - .js=.mjs
         EntryPoints:
@@ -165,11 +160,11 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: !Ref EnableMinify
+        Minify: true
         Target: "es2024"
         Format: "esm"
         MainFields: module,main # This is to help with ESM modules
-        Sourcemap: !Ref EnableSourceMaps
+        Sourcemap: false
         OutExtension:
           - .js=.mjs
         EntryPoints:
