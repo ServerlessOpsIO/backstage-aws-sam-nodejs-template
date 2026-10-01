@@ -15,7 +15,7 @@
   "engines": {
     "node": ">=${{ values.nodejs_version }}.0.0"
   },
-  "packageManager": "yarn@4.4.1",
+  "packageManager": "yarn@4.18.1",
   "scripts": {
     "clean": "rm -rf dist .aws-sam",
     "compile": "node_modules/typescript/bin/tsc",
