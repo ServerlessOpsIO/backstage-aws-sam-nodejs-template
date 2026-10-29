@@ -13,6 +13,7 @@ When used from Backstage, the template generates a new repository that includes:
 - Lambda functions for create, read, update, and delete operations
 - A DynamoDB table with a composite key design for generic item storage
 - OpenAPI documentation for the generated API
+- A developer handbook in `docs/handbook/`, published through Backstage TechDocs
 - GitHub Actions workflows for validation and deployment
 - Backstage catalog metadata and repository registration
 
@@ -21,7 +22,7 @@ When used from Backstage, the template generates a new repository that includes:
 - `template.yaml` — the Backstage scaffolder definition
 - `skeleton/` — project files copied into the generated repository
 - `skeleton/base/` — base Node.js/SAM project configuration and tooling
-- `skeleton/crud/` — CRUD API resource definitions and starter API docs
+- `skeleton/crud/` — CRUD API resource definitions, starter API docs, and the generated project handbook (`docs/handbook/` and `mkdocs.yml`)
 - `functions/` — generated Lambda function templates and starter application logic
 - `pipeline/` — GitHub Actions pipeline templates for CI/CD
 
@@ -56,6 +57,14 @@ It then:
 4. creates the deployment pipeline files,
 5. publishes the repository to GitHub, and
 6. registers the generated component in Backstage.
+
+## TechDocs
+
+The generated `catalog-info.yaml` sets `backstage.io/techdocs-ref: dir:.`, so the
+generated handbook appears in the component's **Docs** tab. This requires the
+Backstage TechDocs frontend and backend, with either on-demand generation or an
+external builder and publisher that has MkDocs and `mkdocs-techdocs-core`
+installed. The generated workflows do not build or publish documentation.
 
 ## Generated project structure
 
