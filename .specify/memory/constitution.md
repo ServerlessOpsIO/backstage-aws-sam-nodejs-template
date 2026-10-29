@@ -1,15 +1,17 @@
 <!--
 Sync Impact Report
-Version change: unratified scaffold → 1.0.0
-Modified principles: scaffold placeholders → I. Every option combination renders correctly;
-II. The catalog drives the inputs; III. Published repositories and entities are predictable;
-IV. Steps are ordered, optional, and fail safely; V. Credentials and secrets stay out of
-templates; VI. The form is honest and the templates are consistent.
-Added sections: Scope and applicability; Development workflow and quality gates.
+Version change: 1.0.0 → 1.1.0
+Modified principles: None.
+Added sections: None.
+Modified sections: Development workflow and quality gates — added a rule requiring each new
+feature to be evaluated against the generated-project handbook (`skeleton/crud/docs/handbook/`)
+and the handbook to be updated in the same change when affected.
 Removed sections: None.
-Follow-up TODOs: The existing template passes the system name as owner_name when rendering
-catalog-info.yaml, does not document the positional cloud-account lookup next to its use, and
-has no output.links. Address those template gaps separately.
+Templates requiring updates: None. `.specify/templates/plan-template.md` derives its
+Constitution Check gates from this file; spec, tasks, and checklist templates need no change.
+Follow-up TODOs: Carried forward from 1.0.0 — the template passes the system name as
+owner_name when rendering catalog-info.yaml, does not document the positional cloud-account
+lookup next to its use, and has no output.links. Address those template gaps separately.
 Omitted rules: Workflow-template branch and pull-request rules are inapplicable because this
 repository has no workflow template. Copilot, Spec Kit, Datadog, and other optional integrations
 are not present. Generated application and infrastructure design is outside this constitution.
@@ -144,6 +146,12 @@ repository adds such a template.
 - Changes to template inputs, generated files, required catalog entities, required
   secrets, required Backstage actions, or other prerequisites MUST update `README.md` in
   the same change and update the generated-project README when affected.
+- When creating a new feature, its spec and plan MUST evaluate the feature against the
+  generated-project handbook in `skeleton/crud/docs/handbook/` and record whether the handbook
+  requires updating. A feature that changes generated files, template inputs, generated
+  infrastructure, workflows, tooling, prerequisites, or documented behavior MUST update the
+  affected handbook pages, and `mkdocs.yml` navigation when pages change, in the same change.
+  Pull requests MUST state the outcome of that evaluation.
 - A template requiring a new or changed scaffolder action MUST name the action and the
   Backstage module that provides it in `README.md`.
 - Generated, operating-system, and editor files, including `.DS_Store`, `__pycache__`,
@@ -163,4 +171,4 @@ semantic versioning: MAJOR removes or incompatibly redefines a principle; MINOR 
 principle or section or materially expands guidance; PATCH clarifies existing guidance.
 Pull-request review MUST verify that changes comply with this constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-10-29
+**Version**: 1.1.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-10-29
